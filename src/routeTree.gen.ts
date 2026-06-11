@@ -16,7 +16,9 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminCreateAdminRouteImport } from './routes/admin.create-admin'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
+import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as PublicRegisterRouteImport } from './routes/_public.register'
 import { Route as PublicLoginRouteImport } from './routes/_public.login'
 import { Route as PublicCoursesRouteImport } from './routes/_public.courses'
@@ -57,9 +59,19 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCreateAdminRoute = AdminCreateAdminRouteImport.update({
+  id: '/create-admin',
+  path: '/create-admin',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCoursesRoute = AdminCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => AdminRoute,
 } as any)
 const PublicRegisterRoute = PublicRegisterRouteImport.update({
@@ -97,7 +109,9 @@ export interface FileRoutesByFullPath {
   '/courses': typeof PublicCoursesRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/courses': typeof AdminCoursesRoute
+  '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/admin/': typeof AdminIndexRoute
@@ -109,7 +123,9 @@ export interface FileRoutesByTo {
   '/courses': typeof PublicCoursesRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/courses': typeof AdminCoursesRoute
+  '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/': typeof PublicIndexRoute
@@ -125,7 +141,9 @@ export interface FileRoutesById {
   '/_public/courses': typeof PublicCoursesRoute
   '/_public/login': typeof PublicLoginRoute
   '/_public/register': typeof PublicRegisterRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/courses': typeof AdminCoursesRoute
+  '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
   '/_public/': typeof PublicIndexRoute
@@ -142,7 +160,9 @@ export interface FileRouteTypes {
     | '/courses'
     | '/login'
     | '/register'
+    | '/admin/approvals'
     | '/admin/courses'
+    | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
     | '/admin/'
@@ -154,7 +174,9 @@ export interface FileRouteTypes {
     | '/courses'
     | '/login'
     | '/register'
+    | '/admin/approvals'
     | '/admin/courses'
+    | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
     | '/'
@@ -169,7 +191,9 @@ export interface FileRouteTypes {
     | '/_public/courses'
     | '/_public/login'
     | '/_public/register'
+    | '/admin/approvals'
     | '/admin/courses'
+    | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
     | '/_public/'
@@ -233,11 +257,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/create-admin': {
+      id: '/admin/create-admin'
+      path: '/create-admin'
+      fullPath: '/admin/create-admin'
+      preLoaderRoute: typeof AdminCreateAdminRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/courses': {
       id: '/admin/courses'
       path: '/courses'
       fullPath: '/admin/courses'
       preLoaderRoute: typeof AdminCoursesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/approvals': {
+      id: '/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AdminApprovalsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_public/register': {
@@ -300,14 +338,18 @@ const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
 interface AdminRouteChildren {
+  AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminCoursesRoute: typeof AdminCoursesRoute
+  AdminCreateAdminRoute: typeof AdminCreateAdminRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEnquiriesRoute: typeof AdminEnquiriesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminApprovalsRoute: AdminApprovalsRoute,
   AdminCoursesRoute: AdminCoursesRoute,
+  AdminCreateAdminRoute: AdminCreateAdminRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEnquiriesRoute: AdminEnquiriesRoute,
   AdminIndexRoute: AdminIndexRoute,

@@ -5,12 +5,9 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import Session, select
 
-from backend.database import create_db_and_tables, get_db
-from backend.routers import auth, courses, enquiries, dashboard, review  # Fixed: reviews
-from backend.services.auth_service import get_user_by_email, create_user
-from backend.models.user import User, Role
+# Import Routers ONLY
+from backend.routers import auth, courses, enquiries, dashboard, review 
 
 app = FastAPI(title="Pystack Backend")
 
@@ -23,45 +20,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create tables on startup (Simple version)
+from backend.database import create_db_and_tables
+
+@app.on_event("startup")
+def startup_event():
+    create_db_and_tables()
+
 # Include Routers
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(courses.router, prefix="/courses", tags=["courses"])
 app.include_router(enquiries.router, prefix="/enquiries", tags=["enquiries"])
 app.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
-app.include_router(review.router, prefix="/reviews", tags=["reviews"])   # Fixed name
-
-
-@app.on_event("startup")
-def startup_event():
-    create_db_and_tables()
-    
-    # Create SuperAdmin if not exists
-    db = next(get_db())   # Get session from generator
-    
-    superadmin_email = "superadmin@pystack.local"
-    default_password = "SuperPass123!"
-    
-    if not get_user_by_email(db, superadmin_email):
-        # Create user with default "User" role first
-        superadmin = create_user(db, superadmin_email, default_password, "Super Admin")
-        
-        # Assign SuperAdmin role
-        super_role = db.exec(select(Role).where(Role.name == "SuperAdmin")).first()
-        if super_role:
-            superadmin.roles.clear()
-            superadmin.roles.append(super_role)
-            superadmin.is_active = True  # SuperAdmin is auto-approved
-            
-            db.add(superadmin)
-            db.commit()
-            db.refresh(superadmin)
-            
-            print(f"✅ SuperAdmin created successfully: {superadmin_email}")
-        else:
-            print("⚠️ SuperAdmin role not found. Please insert roles first.")
-    else:
-        print(f"SuperAdmin already exists: {superadmin_email}")
-
+app.include_router(review.router, prefix="/reviews", tags=["reviews"])
 
 if __name__ == "__main__":
     import uvicorn
