@@ -10,10 +10,7 @@ export const Route = createFileRoute("/_public/login")({
   head: () => ({
     meta: [
       { title: "Login — Pystack Academy" },
-      {
-        name: "description",
-        content: "Pystack Academy login portal.",
-      },
+      { name: "description", content: "Pystack Academy login portal." },
     ],
   }),
   component: Login,
@@ -60,10 +57,11 @@ function Login() {
         setTimeout(() => {
           navigate({
             to: destination,
-            replace: true, // Replace history so back button doesn't return to login
+            replace: true, 
           });
         }, 1500);
       } else {
+        // This will show the specific backend error (e.g., "Account pending approval")
         showToast(r.error || "Login failed", "error");
       }
     } finally {
@@ -87,7 +85,7 @@ function Login() {
                 P
               </div>
 
-              <h1 className="mt-4 text-2xl font-bold text-navy">
+              <h1 className="mt-4 text-2xl font-bold text-navy dark:text-white">
                 Welcome Back
               </h1>
 
@@ -98,7 +96,7 @@ function Login() {
 
             <form onSubmit={submit} className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-navy block mb-1.5">
+                <label className="text-sm font-medium text-navy dark:text-gray-200 block mb-1.5">
                   Email
                 </label>
 
@@ -112,13 +110,13 @@ function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
                     placeholder="Enter your email"
-                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all"
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all dark:bg-gray-800 dark:border-gray-600"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-navy block mb-1.5">
+                <label className="text-sm font-medium text-navy dark:text-gray-200 block mb-1.5">
                   Password
                 </label>
 
@@ -132,7 +130,7 @@ function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                     placeholder="Enter your password"
-                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all"
+                    className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all dark:bg-gray-800 dark:border-gray-600"
                   />
                 </div>
               </div>
@@ -146,7 +144,7 @@ function Login() {
               </button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-border text-center">
+            <div className="mt-6 pt-6 border-t border-border dark:border-gray-700 text-center">
               <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <Link

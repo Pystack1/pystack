@@ -5,6 +5,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlmodel import Session, select
+from sqlalchemy.orm import joinedload   # ← ADD THIS LINE
 
 from backend.database import get_db
 from backend.models.user import User
@@ -55,7 +56,12 @@ def get_current_user(
     token = credentials.credentials
     email = decode_token(token, "access")
     
-    user = db.exec(select(User).where(User.email == email)).first()
+    user = db.exec(
+        select(User)
+        .options(joinedload(User.roles))
+        .where(User.email == email)
+    ).unique().first()      # ← Add .unique()
+    
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="Invalid credentials or account not approved")
     return user
