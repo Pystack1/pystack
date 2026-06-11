@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 
+from backend.models.user_profile import UserProfile
+
 # ====================== ASSOCIATION TABLE ======================
 class UserRole(SQLModel, table=True):
     __tablename__ = "user_roles"
@@ -40,3 +42,6 @@ class User(SQLModel, table=True):
         back_populates="users",
         link_model=UserRole
     )
+    profile: Optional["UserProfile"] = Relationship(
+    back_populates="user"
+)

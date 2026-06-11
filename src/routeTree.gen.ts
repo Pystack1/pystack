@@ -9,11 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as UserRouteImport } from './routes/user'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
+import { Route as UserProfileRouteImport } from './routes/user.profile'
+import { Route as UserDashboardRouteImport } from './routes/user.dashboard'
 import { Route as AdminEnquiriesRouteImport } from './routes/admin.enquiries'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminCreateAdminRouteImport } from './routes/admin.create-admin'
@@ -25,9 +27,9 @@ import { Route as PublicCoursesRouteImport } from './routes/_public.courses'
 import { Route as PublicContactRouteImport } from './routes/_public.contact'
 import { Route as PublicAboutRouteImport } from './routes/_public.about'
 
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const UserRoute = UserRouteImport.update({
+  id: '/user',
+  path: '/user',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -48,6 +50,16 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PublicRoute,
+} as any)
+const UserProfileRoute = UserProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => UserRoute,
+} as any)
+const UserDashboardRoute = UserDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => UserRoute,
 } as any)
 const AdminEnquiriesRoute = AdminEnquiriesRouteImport.update({
   id: '/enquiries',
@@ -103,7 +115,7 @@ const PublicAboutRoute = PublicAboutRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/admin': typeof AdminRouteWithChildren
-  '/dashboard': typeof DashboardRoute
+  '/user': typeof UserRouteWithChildren
   '/about': typeof PublicAboutRoute
   '/contact': typeof PublicContactRoute
   '/courses': typeof PublicCoursesRoute
@@ -114,10 +126,12 @@ export interface FileRoutesByFullPath {
   '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/user/dashboard': typeof UserDashboardRoute
+  '/user/profile': typeof UserProfileRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
-  '/dashboard': typeof DashboardRoute
+  '/user': typeof UserRouteWithChildren
   '/about': typeof PublicAboutRoute
   '/contact': typeof PublicContactRoute
   '/courses': typeof PublicCoursesRoute
@@ -128,6 +142,8 @@ export interface FileRoutesByTo {
   '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/user/dashboard': typeof UserDashboardRoute
+  '/user/profile': typeof UserProfileRoute
   '/': typeof PublicIndexRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -135,7 +151,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
-  '/dashboard': typeof DashboardRoute
+  '/user': typeof UserRouteWithChildren
   '/_public/about': typeof PublicAboutRoute
   '/_public/contact': typeof PublicContactRoute
   '/_public/courses': typeof PublicCoursesRoute
@@ -146,6 +162,8 @@ export interface FileRoutesById {
   '/admin/create-admin': typeof AdminCreateAdminRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/enquiries': typeof AdminEnquiriesRoute
+  '/user/dashboard': typeof UserDashboardRoute
+  '/user/profile': typeof UserProfileRoute
   '/_public/': typeof PublicIndexRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -154,7 +172,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/dashboard'
+    | '/user'
     | '/about'
     | '/contact'
     | '/courses'
@@ -165,10 +183,12 @@ export interface FileRouteTypes {
     | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
+    | '/user/dashboard'
+    | '/user/profile'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/dashboard'
+    | '/user'
     | '/about'
     | '/contact'
     | '/courses'
@@ -179,13 +199,15 @@ export interface FileRouteTypes {
     | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
+    | '/user/dashboard'
+    | '/user/profile'
     | '/'
     | '/admin'
   id:
     | '__root__'
     | '/_public'
     | '/admin'
-    | '/dashboard'
+    | '/user'
     | '/_public/about'
     | '/_public/contact'
     | '/_public/courses'
@@ -196,6 +218,8 @@ export interface FileRouteTypes {
     | '/admin/create-admin'
     | '/admin/dashboard'
     | '/admin/enquiries'
+    | '/user/dashboard'
+    | '/user/profile'
     | '/_public/'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -203,16 +227,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
-  DashboardRoute: typeof DashboardRoute
+  UserRoute: typeof UserRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/user': {
+      id: '/user'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -242,6 +266,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/user/profile': {
+      id: '/user/profile'
+      path: '/profile'
+      fullPath: '/user/profile'
+      preLoaderRoute: typeof UserProfileRouteImport
+      parentRoute: typeof UserRoute
+    }
+    '/user/dashboard': {
+      id: '/user/dashboard'
+      path: '/dashboard'
+      fullPath: '/user/dashboard'
+      preLoaderRoute: typeof UserDashboardRouteImport
+      parentRoute: typeof UserRoute
     }
     '/admin/enquiries': {
       id: '/admin/enquiries'
@@ -357,10 +395,22 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface UserRouteChildren {
+  UserDashboardRoute: typeof UserDashboardRoute
+  UserProfileRoute: typeof UserProfileRoute
+}
+
+const UserRouteChildren: UserRouteChildren = {
+  UserDashboardRoute: UserDashboardRoute,
+  UserProfileRoute: UserProfileRoute,
+}
+
+const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
-  DashboardRoute: DashboardRoute,
+  UserRoute: UserRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

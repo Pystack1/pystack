@@ -37,7 +37,7 @@ export function Navbar() {
             to="/login"
             className="text-sm font-semibold px-4 py-2 rounded-lg bg-gradient-primary text-primary-foreground shadow-elegant hover:opacity-90 transition-opacity"
           >
-            Admin Login
+             Login
           </Link>
         </nav>
 

@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaLock, FaUser } from "react-icons/fa";
 import { useAuthStore } from "@/store/authStore";
-import { useToast } from "@/hooks/useToast";
-import { ToastContainer } from "@/components/ui/ToastContainer";
 
 export const Route = createFileRoute("/_public/login")({
   head: () => ({
@@ -20,50 +18,52 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { login, isAuthenticated } = useAuthStore();
-  const { toasts, showToast } = useToast();
+  const { login, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
   // Redirect if already logged in
   useEffect(() => {
-    if (isAuthenticated) {
-      const { user } = useAuthStore.getState();
-      const isAdmin = user?.roles.some((role) => role === "SuperAdmin" || role === "Admin");
+    if (isAuthenticated && user) {
+      const isAdmin = user.roles.some((role) => role === "SuperAdmin" || role === "Admin");
+      // FIX: Changed "/dashboard" to "/user/dashboard"
+      const destination = isAdmin ? "/admin/dashboard" : "/user/dashboard";
       
       navigate({
-        to: isAdmin ? "/admin/dashboard" : "/dashboard",
+        to: destination,
         replace: true,
       });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null); // Clear previous errors
 
     try {
       const r = await login(email, password);
 
       if (r.ok) {
-        showToast("Login successful! Redirecting...", "success");
-
         // Determine redirect path based on roles
-        const { user } = useAuthStore.getState();
-        const isAdmin = user?.roles.some((role) => role === "SuperAdmin" || role === "Admin");
+        const currentUser = useAuthStore.getState().user;
+        const isAdmin = currentUser?.roles.some((role) => role === "SuperAdmin" || role === "Admin");
         
-        const destination = isAdmin ? "/admin/dashboard" : "/dashboard";
+        // FIX: Changed "/dashboard" to "/user/dashboard"
+        const destination = isAdmin ? "/admin/dashboard" : "/user/dashboard";
 
+        // Redirect immediately or after a short delay
         setTimeout(() => {
-          navigate({
-            to: destination,
-            replace: true, 
-          });
-        }, 1500);
+          navigate({ to: destination, replace: true });
+        }, 500);
       } else {
-        // This will show the specific backend error (e.g., "Account pending approval")
-        showToast(r.error || "Login failed", "error");
+        // Show error under button (Red color)
+        setErrorMessage(r.error || "Login failed. Please check your credentials.");
       }
+    } catch (error: any) {
+      // Catch any unexpected errors
+      setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -71,8 +71,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <ToastContainer toasts={toasts} />
-
       <main className="flex-1 bg-gradient-hero flex items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -110,6 +108,7 @@ function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
                     placeholder="Enter your email"
+                    autoComplete="email"
                     className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all dark:bg-gray-800 dark:border-gray-600"
                   />
                 </div>
@@ -130,18 +129,34 @@ function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     className="w-full pl-11 pr-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm transition-all dark:bg-gray-800 dark:border-gray-600"
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg bg-gradient-primary text-primary-foreground font-semibold shadow-elegant hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {loading ? "Signing In..." : "Sign In"}
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg bg-gradient-primary text-primary-foreground font-semibold shadow-elegant hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Signing In..." : "Sign In"}
+                </button>
+
+                {/* Error Message Display - Red Blinking Text */}
+                {errorMessage && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center"
+                  >
+                    <span className="text-red-500 text-sm font-medium animate-pulse block bg-red-50 dark:bg-red-900/20 py-2 px-4 rounded-lg border border-red-100 dark:border-red-900/50">
+                      {errorMessage}
+                    </span>
+                  </motion.div>
+                )}
+              </div>
             </form>
 
             <div className="mt-6 pt-6 border-t border-border dark:border-gray-700 text-center">

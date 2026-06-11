@@ -38,32 +38,44 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         try {
           // 1. Call Login API
-          // api.post returns the data directly, so we name it 'loginData', not 'response'
-          const loginData = await api.post<LoginResponse>("/auth/login", { email, password });
+          const loginData: LoginResponse = await api.post("/auth/login", { email, password });
 
           // 2. Fetch User Info manually using the new token
-          // We use raw fetch here to avoid circular dependency / hydration timing issues
+          // Using raw fetch to avoid potential circular dependency issues with the api service during login
           const userResponse = await fetch("http://localhost:8000/auth/me", {
             headers: { Authorization: `Bearer ${loginData.access_token}` }
           });
 
           if (!userResponse.ok) throw new Error("Failed to fetch user profile");
-          const userData = await userResponse.json();
+          const userData: User = await userResponse.json();
 
           // 3. Update State
           set({
             isAuthenticated: true,
-            accessToken: loginData.access_token, // <--- REMOVED .data
-            refreshToken: loginData.refresh_token, // <--- REMOVED .data
+            accessToken: loginData.access_token,
+            refreshToken: loginData.refresh_token,
             user: userData,
           });
 
           return { ok: true };
         } catch (err: any) {
-          console.error("Login error:", err);
+          console.error("Login error object:", err);
+          
+          let errorMessage = "Login failed. Please try again.";
+
+          // FIX: Check for the specific FastAPI detail message first
+          // Axios wraps the response in err.response
+          if (err?.response?.data?.detail) {
+            errorMessage = err.response.data.detail;
+          } 
+          // Fallback if the error structure is different
+          else if (err?.message) {
+            errorMessage = err.message;
+          }
+
           return {
             ok: false,
-            error: err.message || "Login failed",
+            error: errorMessage,
           };
         }
       },
