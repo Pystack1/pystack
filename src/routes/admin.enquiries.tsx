@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FaSearch, FaTrash, FaEnvelope, FaCalendar } from "react-icons/fa";
+import { FaSearch, FaTrash, FaEnvelope, FaCalendar, FaPhone, FaBook } from "react-icons/fa"; // <-- Added FaPhone, FaBook
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 
@@ -9,8 +9,10 @@ interface Enquiry {
   id: number;
   name: string;
   email: string;
+  mobile: string; // <-- Added
   message: string;
   course_id?: number;
+  course_title?: string; // <-- Added
   created_at: string;
 }
 
@@ -23,8 +25,6 @@ function EnquiryManagement() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  
-  // 1. Added Date Filter State
   const [dateFilter, setDateFilter] = useState("");
 
   // Fetch enquiries on mount
@@ -43,15 +43,13 @@ function EnquiryManagement() {
     fetchEnquiries();
   }, [hydrated]);
 
-  // 2. Updated Filter Logic (Date + Search Name/Message)
+  // Filter Logic
   const list = useMemo(() => {
     return enquiries.filter((e) => {
-      // Search: Name OR Message
-      const matchesSearch = (e.name + e.message)
+      const matchesSearch = (e.name + e.message + e.email + (e.course_title || ""))
         .toLowerCase()
         .includes(q.toLowerCase());
 
-      // Date Filter: If a date is selected, check if enquiry is on or after that date
       let matchesDate = true;
       if (dateFilter) {
         const selectedDate = new Date(dateFilter).setHours(0,0,0,0);
@@ -63,11 +61,13 @@ function EnquiryManagement() {
     });
   }, [enquiries, q, dateFilter]);
 
+  // FIX: Properly update state after delete
   const deleteEnquiry = async (id: number) => {
     if (!confirm("Delete this enquiry?")) return;
     try {
       await api.delete(`/enquiries/${id}`);
-      setEnquiries(enquiries.filter(e => e.id !== id));
+      // Remove from state immediately
+      setEnquiries((prev) => prev.filter((e) => e.id !== id));
     } catch (err) {
       console.error("Failed to delete enquiry:", err);
     }
@@ -80,21 +80,18 @@ function EnquiryManagement() {
         <p className="mt-1 text-sm sm:text-base text-muted-foreground">All contact form submissions in one place.</p>
       </div>
 
-      {/* 3. Search & Filter Bar - Responsive */}
+      {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4 max-w-4xl w-full">
-        
-        {/* Search Input */}
         <div className="relative flex-1 w-full">
           <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
           <input 
             value={q} 
             onChange={(e) => setQ(e.target.value)} 
-            placeholder="Search name or message..."
+            placeholder="Search name, email, message or course..."
             className="w-full pl-11 pr-4 py-2.5 rounded-lg bg-card border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm" 
           />
         </div>
 
-        {/* Date Filter Input */}
         <div className="relative w-full sm:w-64">
           <FaCalendar className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" />
           <input 
@@ -104,7 +101,6 @@ function EnquiryManagement() {
             className="w-full pl-11 pr-4 py-2.5 rounded-lg bg-card border border-border focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
           />
         </div>
-
       </div>
 
       {loading ? (
@@ -121,7 +117,6 @@ function EnquiryManagement() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-navy truncate">{e.name}</div>
-                  {/* Better Date Formatting */}
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {new Date(e.created_at).toLocaleString(undefined, { 
                       year: 'numeric', month: 'short', day: 'numeric', 
@@ -129,16 +124,33 @@ function EnquiryManagement() {
                     })}
                   </div>
                 </div>
-                <button onClick={() => deleteEnquiry(e.id)}
-                  className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors flex-shrink-0">
+                <button 
+                  onClick={() => deleteEnquiry(e.id)}
+                  className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors flex-shrink-0"
+                >
                   <FaTrash />
                 </button>
               </div>
+
               <div className="mt-3 space-y-1.5 text-sm">
                 <div className="flex items-center gap-2 text-foreground/80">
-                  <FaEnvelope className="text-primary text-xs flex-shrink-0" /> <span className="truncate">{e.email}</span>
+                  <FaEnvelope className="text-primary text-xs flex-shrink-0" /> 
+                  <span className="truncate">{e.email}</span>
                 </div>
+                {/* Mobile Number */}
+                <div className="flex items-center gap-2 text-foreground/80">
+                  <FaPhone className="text-green-600 text-xs flex-shrink-0" /> 
+                  <span>{e.mobile}</span>
+                </div>
+                {/* Course Title */}
+                {e.course_title && (
+                  <div className="flex items-center gap-2 text-foreground/80">
+                    <FaBook className="text-indigo-600 text-xs flex-shrink-0" /> 
+                    <span className="font-medium text-indigo-600">{e.course_title}</span>
+                  </div>
+                )}
               </div>
+
               <p className="mt-3 text-sm text-foreground/70 leading-relaxed border-t border-border pt-3">
                 {e.message}
               </p>
