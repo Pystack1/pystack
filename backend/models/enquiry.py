@@ -9,5 +9,6 @@ class Enquiry(SQLModel, table=True):
     name: str
     email: str
     message: str
+    mobile: str
     course_id: Optional[int] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)  # <-- FIXED: Optional + default
