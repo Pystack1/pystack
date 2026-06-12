@@ -10,11 +10,11 @@ import {
 import { useAuthStore } from "@/store/authStore"; // <--- FIXED: Added missing import
 
 const menuItems = [
-  { to: "/dashboard", label: "Dashboard", icon: FaHome },
-  { to: "/dashboard/courses", label: "My Courses", icon: FaBook },
-  { to: "/dashboard/enquiries", label: "My Enquiries", icon: FaEnvelope },
-  { to: "/dashboard/profile", label: "My Profile", icon: FaUser },
-  { to: "/dashboard/assignments", label: "Assignments", icon: FaChalkboardTeacher },
+  { to: "/user/dashboard", label: "Dashboard", icon: FaHome },
+  { to: "/user/courses", label: "My Courses", icon: FaBook },
+  { to: "/user/enquiries", label: "My Enquiries", icon: FaEnvelope },
+  { to: "/user/profile", label: "My Profile", icon: FaUser },
+  { to: "/user/assignments", label: "Assignments", icon: FaChalkboardTeacher },
 ];
 
 interface UserSidebarProps {
