@@ -32,7 +32,6 @@ export const Route = createFileRoute("/user/profile")({
 });
 
 function UserProfile() {
-  // Removed useNavigate because the Navbar handles navigation now
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,7 +52,6 @@ function UserProfile() {
     profile_photo_url: "",
   });
 
-  // UI States
   const [popupMessage, setPopupMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -74,28 +72,27 @@ function UserProfile() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files && e.target.files[0]) {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        setSaving(true);
-        const res = await api.post<UploadResponse>("/user/profile/upload-photo", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        
-        setProfile({ ...profile, profile_photo_url: res.url });
-        showPopup("success", "Photo updated successfully!");
-      } catch (err) {
-        showPopup("error", "Failed to upload photo");
-      } finally {
-        setSaving(false);
-      }
+    try {
+      setSaving(true);
+      // Use api.upload instead of raw fetch
+      const res = await api.upload<UploadResponse>("/user/profile/upload-photo", formData);
+      
+      setProfile({ ...profile, profile_photo_url: res.url });
+      showPopup("success", "Photo updated successfully!");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      showPopup("error", err.message || "Failed to upload photo");
+    } finally {
+      setSaving(false);
     }
-  };
+  }
+};
 
   const showPopup = (type: 'success' | 'error', text: string) => {
     setPopupMessage({ type, text });
@@ -122,7 +119,6 @@ function UserProfile() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Popup Overlay */}
       <AnimatePresence>
         {popupMessage && (
           <motion.div
@@ -139,17 +135,13 @@ function UserProfile() {
       </AnimatePresence>
 
       <div className="max-w-6xl mx-auto">
-        {/* Header - Integrated with Layout */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-navy dark:text-white">My Profile</h1>
           <p className="mt-1 text-sm text-muted-foreground">Manage your personal information and preferences</p>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
-          {/* Left Column: Photo & Basic Info (Spans 4 columns) */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Profile Photo Card */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center text-center">
               <div className="relative w-40 h-40 mb-6 group">
                 <motion.img
@@ -182,7 +174,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Quick Help Card */}
             <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-md p-6 text-white">
               <h3 className="font-bold text-lg mb-2">Need Help?</h3>
               <p className="text-sm text-indigo-100 mb-4">If you have trouble updating your details, contact support.</p>
@@ -192,17 +183,13 @@ function UserProfile() {
             </div>
           </div>
 
-          {/* Right Column: Detailed Form (Spans 8 columns) */}
           <div className="lg:col-span-8 space-y-6">
-            
-            {/* Section: Personal Details */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
               <h3 className="text-lg font-bold text-navy dark:text-white mb-6 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <FaUser className="text-indigo-500" /> Personal Details
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Full Name */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
                   <input
@@ -215,7 +202,6 @@ function UserProfile() {
                   />
                 </div>
 
-                {/* Email */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
                   <div className="relative">
@@ -231,7 +217,6 @@ function UserProfile() {
                   <p className="text-xs text-gray-500 mt-1.5">Updating email changes your login credential.</p>
                 </div>
 
-                {/* Mobile */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Mobile Number</label>
                   <input
@@ -244,7 +229,6 @@ function UserProfile() {
                   />
                 </div>
 
-                {/* Date of Birth */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Date of Birth</label>
                   <input
@@ -257,7 +241,6 @@ function UserProfile() {
                   />
                 </div>
 
-                {/* Gender */}
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Gender</label>
                   <div className="flex gap-6">
@@ -279,7 +262,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Section: Address */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
               <h3 className="text-lg font-bold text-navy dark:text-white mb-6 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <FaMapMarkerAlt className="text-indigo-500" /> Address
@@ -330,7 +312,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Section: Identification */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
               <h3 className="text-lg font-bold text-navy dark:text-white mb-6 flex items-center gap-2 pb-4 border-b border-gray-100 dark:border-gray-700">
                 <FaIdCard className="text-indigo-500" /> Identification
@@ -364,7 +345,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex items-center justify-end gap-4 pt-4">
               <div className="mr-auto text-sm text-gray-500">
                 Last updated: {new Date().toLocaleDateString()}
@@ -377,7 +357,6 @@ function UserProfile() {
                 {saving ? "Saving..." : <><FaSave /> Save Changes</>}
               </button>
             </div>
-
           </div>
         </form>
       </div>

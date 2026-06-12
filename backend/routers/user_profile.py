@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlmodel import Session
-from typing import List
+from typing import List, Optional
 
 from backend.database import get_db
 from backend.models.user import User
@@ -8,14 +8,25 @@ from backend.models.user_profile import UserProfile
 from backend.schemas.user_profile import UserProfileRead, UserProfileUpdate
 from backend.services.user_profile_service import get_profile_by_user_id, create_or_update_profile
 from backend.security.jwt import get_current_user
+import shutil
+from pathlib import Path
 
 router = APIRouter(prefix="/profile", tags=["User Profile"])
 
-# Helper: Mock upload (Replace with S3/Cloudinary in production)
+# Helper: Save upload file locally
 def save_upload_file(upload_file: UploadFile) -> str:
-    # For demo, just return a fake URL or local path logic
-    # In real app: file.location (S3)
-    return f"http://localhost:8000/static/uploads/{upload_file.filename}"
+    upload_dir = Path("static/uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Clean filename to avoid path traversal
+    safe_filename = Path(upload_file.filename).name
+    file_path = upload_dir / safe_filename
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(upload_file.file, buffer)
+    
+    return f"http://localhost:8000/static/uploads/{safe_filename}"
 
 @router.get("", response_model=UserProfileRead)
 def get_my_profile(
@@ -25,14 +36,12 @@ def get_my_profile(
     profile = get_profile_by_user_id(db, current_user.id)
     
     if not profile:
-        # Return a default structure if profile doesn't exist yet
         return UserProfileRead(
             id=0, 
             user_id=current_user.id, 
             email=current_user.email
         )
     
-    # Attach email from user table to response
     profile_data = profile.dict()
     profile_data["email"] = current_user.email
     return UserProfileRead(**profile_data)
@@ -58,7 +67,7 @@ async def upload_photo(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Mock upload logic
+    # Save file
     url = save_upload_file(file)
     
     # Update profile URL

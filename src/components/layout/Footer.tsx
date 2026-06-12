@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { FaLinkedin, FaTwitter, FaInstagram, FaYoutube, FaEnvelope, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
+import logo from "@/assets/pystack_logo.png";
 
 export function Footer() {
   return (
@@ -7,7 +8,11 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 grid gap-10 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <span className="h-9 w-9 rounded-lg bg-gradient-primary grid place-items-center text-primary-foreground font-bold">P</span>
+            <img 
+              src={logo} 
+              alt="Pystack Academy" 
+              className="h-13 w-13 rounded-lg object-cover"
+            />
             <span className="font-display text-lg font-bold">Pystack Academy</span>
           </div>
           <p className="text-sm text-navy-foreground/70 leading-relaxed">

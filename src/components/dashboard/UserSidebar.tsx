@@ -7,18 +7,19 @@ import {
   FaSignOutAlt,
   FaChalkboardTeacher 
 } from "react-icons/fa";
-import { useAuthStore } from "@/store/authStore"; // <--- FIXED: Added missing import
+import { useAuthStore } from "@/store/authStore";
+import logo from "@/assets/pystack_logo.png"; // <-- import logo
 
 const menuItems = [
   { to: "/user/dashboard", label: "Dashboard", icon: FaHome },
+  { to: "/user/profile", label: "My Profile", icon: FaUser },
   { to: "/user/courses", label: "My Courses", icon: FaBook },
   { to: "/user/enquiries", label: "My Enquiries", icon: FaEnvelope },
-  { to: "/user/profile", label: "My Profile", icon: FaUser },
   { to: "/user/assignments", label: "Assignments", icon: FaChalkboardTeacher },
 ];
 
 interface UserSidebarProps {
-  closeSidebar?: () => void; // <--- FIXED: Added interface for optional prop
+  closeSidebar?: () => void;
 }
 
 export default function UserSidebar({ closeSidebar }: UserSidebarProps) {
@@ -29,7 +30,6 @@ export default function UserSidebar({ closeSidebar }: UserSidebarProps) {
     window.location.href = "/login";
   };
 
-  // Helper to close sidebar on mobile when a link is clicked
   const handleLinkClick = () => {
     if (closeSidebar) {
       closeSidebar();
@@ -41,9 +41,12 @@ export default function UserSidebar({ closeSidebar }: UserSidebarProps) {
       {/* Header / Logo */}
       <div className="p-6 border-b border-border/50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-emerald-500/20">
-            P
-          </div>
+          {/* Logo replaces "P" */}
+          <img 
+            src={logo} 
+            alt="Pystack" 
+            className="w-13 h-13 rounded-xl object-cover shadow-lg"
+          />
           <div>
             <h2 className="text-xl font-bold tracking-tight text-navy dark:text-white">Student</h2>
             <p className="text-xs text-muted-foreground">Portal</p>

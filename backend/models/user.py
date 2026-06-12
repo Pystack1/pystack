@@ -33,7 +33,7 @@ class User(SQLModel, table=True):
     email: str = Field(index=True, unique=True)
     full_name: Optional[str] = None
     hashed_password: str
-    is_active: bool = Field(default=False)          # Approval flag
+    is_active: bool = Field(default=True)          # Approval flag
     refresh_token: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"onupdate": datetime.utcnow})

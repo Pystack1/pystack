@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
+import logo from "@/assets/pystack_logo.png"; // <-- import from assets
 
 const links = [
   { to: "/", label: "Home" },
@@ -16,7 +17,11 @@ export function Navbar() {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <span className="h-9 w-9 rounded-lg bg-gradient-primary grid place-items-center text-primary-foreground font-bold shadow-elegant">P</span>
+          <img 
+            src={logo} 
+            alt="Pystack Academy" 
+            className="h-12 w-12 rounded-lg object-cover shadow-elegant"
+          />
           <span className="font-display text-lg font-bold text-navy">Pystack Academy</span>
         </Link>
 

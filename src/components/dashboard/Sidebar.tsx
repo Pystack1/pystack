@@ -7,9 +7,10 @@ import {
   FaHome, 
   FaTimes,
   FaUserCheck,
-  FaUserPlus // Icon for Create Admin
+  FaUserPlus
 } from "react-icons/fa";
 import { useAuthStore } from "@/store/authStore";
+import logo from "@/assets/pystack_logo.png"; // <-- import logo
 
 const items = [
   { to: "/admin/dashboard", label: "Dashboard", icon: FaTachometerAlt },
@@ -26,7 +27,6 @@ export function Sidebar({ closeSidebar }: SidebarProps) {
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   
-  // CHECK: Is the logged in user a SuperAdmin?
   const user = useAuthStore((s) => s.user);
   const isSuperAdmin = user?.roles.includes("SuperAdmin");
 
@@ -44,9 +44,12 @@ export function Sidebar({ closeSidebar }: SidebarProps) {
       {/* Brand Header */}
       <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="h-9 w-9 rounded-lg bg-gradient-primary grid place-items-center text-primary-foreground font-bold text-sm">
-            P
-          </span>
+          {/* Logo replaces "P" */}
+          <img 
+            src={logo} 
+            alt="Pystack" 
+            className="h-13 w-13 rounded-lg object-cover"
+          />
           <span className="font-display font-bold text-sm sm:text-base">Admin Portal</span>
         </div>
         {closeSidebar && (
@@ -80,7 +83,6 @@ export function Sidebar({ closeSidebar }: SidebarProps) {
             </Link>
           ))}
 
-          {/* CREATE ADMIN LINK - Only visible to SuperAdmin */}
           {isSuperAdmin && (
             <Link
               to="/admin/create-admin"
