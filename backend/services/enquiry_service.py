@@ -8,7 +8,6 @@ from backend.models.course import Course
 from backend.schemas.enquiry import EnquiryRead  # <-- Import the Pydantic schema
 
 
-
 def create_enquiry(enquiry: Enquiry) -> Enquiry:
     with Session(engine) as session:
         if enquiry.created_at is None:
